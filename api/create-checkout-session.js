@@ -1,15 +1,17 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export default async (req, res) => {
-  // Разрешаем запросы с Webflow
+  // Явно разрешаем CORS для вашего домена Webflow
   res.setHeader('Access-Control-Allow-Origin', 'https://iulianas-superb-site-211078.webflow.io');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Обрабатываем preflight-запрос
   if (req.method === 'OPTIONS') {
-    return res.status(200).end(); // Подтверждаем preflight
+    return res.status(200).json({}); // Важно вернуть 200 OK
   }
-  
+
+  // Основной POST-запрос
   if (req.method === 'POST') {
     try {
       const session = await stripe.checkout.sessions.create({
@@ -27,6 +29,6 @@ export default async (req, res) => {
       return res.status(500).json({ error: err.message });
     }
   }
-  
-  return res.status(405).end();
+
+  return res.status(405).end(); // Метод не разрешен
 };
