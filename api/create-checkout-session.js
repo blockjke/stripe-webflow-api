@@ -1,20 +1,29 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).end();
+export default async (req, res) => {
+  // Разрешаем CORS
+  res.setHeader('Access-Control-Allow-Origin', 'https://iulianas-superb-site-211078.webflow.io');
+  res.setHeader('Access-Control-Allow-Methods', 'POST');
+  
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  
+  if (req.method === 'POST') {
+    try {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price: 'price_1Rol7ECeW1SaBRWhLBpL92Vx',
+          quantity: 1,
+        }],
+        mode: 'subscription',
+        success_url: `${req.headers.origin}/success`,
+        cancel_url: `${req.headers.origin}/canceled`,
+      });
+      return res.json({ id: session.id });
+    } catch (err) {
+      return res.status(500).json({ error: err.message });
+    }
   }
-
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    line_items: [{
-      price: 'price_1Rol7ECeW1SaBRWhLBpL92Vx', // Замените на ваш Price ID
-      quantity: 1,
-    }],
-    mode: 'subscription',
-    success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${req.headers.origin}/canceled`,
-  });
-
-  res.json({ id: session.id });
-}
+  
+  return res.status(405).end();
+};
