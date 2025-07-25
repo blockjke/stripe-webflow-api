@@ -1,11 +1,14 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export default async (req, res) => {
-  // Разрешаем CORS
+  // Разрешаем запросы с Webflow
   res.setHeader('Access-Control-Allow-Origin', 'https://iulianas-superb-site-211078.webflow.io');
-  res.setHeader('Access-Control-Allow-Methods', 'POST');
-  
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end(); // Подтверждаем preflight
+  }
   
   if (req.method === 'POST') {
     try {
