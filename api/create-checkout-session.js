@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: [{
-      price: 'your_price_id', // Замените на ваш Price ID
+      price: 'price_1Rol7ECeW1SaBRWhLBpL92Vx', // Замените на ваш Price ID
       quantity: 1,
     }],
     mode: 'subscription',
